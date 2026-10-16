@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atharva Phadake — Software Engineer Intern</title>
+  <meta name="description" content="Atharva Phadake — Software Engineer Intern building production-style tools with YOLOv8, PostgreSQL, and full-stack application workflows." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- <link rel="stylesheet" href="theme.css" /> -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo"><span class="bracket">&lt;</span>AP<span class="bracket">/&gt;</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="active">home</a>
+        <a href="about.html">about</a>
+        <a href="projects.html">projects</a>
+        <a href="contact.html" class="nav-cta">contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <p class="hero-eyebrow">// initializing model...</p>
+        <div class="hero-frame">
+          <h1 class="hero-name">Atharva Phadake</h1>
+          <span class="hero-tag">class: engineer &middot; conf: 0.98</span>
+        </div>
+        <p class="hero-tagline">
+          Full-Stack Engineer crafting production-ready AI tools using YOLOv8 and PostgreSQL.
+        </p>
+        <div class="hero-actions">
+          <a href="projects.html" class="btn btn-primary">View Projects</a>
+          <a href="contact.html" class="btn btn-ghost">Contact Me</a>
+          <a href="C:\Users\athar\Desktop\Portfolio\backend\Atharva_Phadake_Resume.pdf" download="Atharva_Phadake_Resume.pdf" class="btn btn-ghost">→ Download CV</a>
+          <button id="openMatcherBtn" class="btn btn-ghost" style="border-color: var(--accent); color: var(--accent);">⚡ AI Job Matcher</button>
+        </div>
+      </div>
+
+      <div class="hero-video-container">
+        <img src="ai_gif.gif" alt="AI Animation" class="hero-video-element">
+      </div>
+    </section>
+
+    <section class="highlights">
+      <div class="container">
+        <span class="tag">focus areas <span class="confidence">x3</span></span>
+        <h2 class="section-heading">Where I spend my time</h2>
+        <p class="section-lead">Three areas I keep coming back to, across internships, coursework, and side projects.</p>
+
+        <div class="highlight-grid">
+          <div class="highlight-card">
+            <span class="highlight-index">01 / vision</span>
+            <h3>AI &amp; Computer Vision</h3>
+            <p>Real-time detection and monitoring systems built with YOLOv8.</p>
+          </div>
+          <div class="highlight-card">
+            <span class="highlight-index">02 / backend</span>
+            <h3>Backend Engineering</h3>
+            <p>APIs and data layers with FastAPI and PostgreSQL.</p>
+          </div>
+          <div class="highlight-card">
+            <span class="highlight-index">03 / language</span>
+            <h3>LLM Pipelines</h3>
+            <p>Retrieval-augmented generation with LangChain and RAG.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Designed &amp; built by Atharva Phadake — &copy; 2026</p>
+  </footer>
+
+  <div id="chat-widget-container">
+    <!-- Ye button hamesha screen par dikhega -->
+    <button id="chat-open-btn">💬 Chat with Atharva's AI</button>
+    
+    <!-- Ye actual chat window hai (by default hidden) -->
+    <div id="chat-box" class="chat-hidden">
+        <div class="chat-header">
+            <h4>Atharva's AI Assistant</h4>
+            <button id="chat-close-btn">✖</button>
+        </div>
+        
+        <div class="chat-messages" id="chat-messages">
+            <p class="bot-msg">Hi! Ask me anything about Atharva's resume, skills, or projects.</p>
+        </div>
+        
+        <div id="chat-chips" class="chat-chips-popover chips-hidden">
+            <div class="chips-header">Quick Suggestions</div>
+            <div class="chips-list">
+                <button class="chat-chip">💼 Show Projects</button>
+                <button class="chat-chip">🛠️ Tech Stack</button>
+                <button class="chat-chip">📄 Research Paper</button>
+                <button class="chat-chip">🎓 Education</button>
+                <button class="chat-chip">📫 Contact Info</button>
+            </div>
+        </div>
+
+        
+        <div class="chat-input-area">
+          <button id="chat-chips-toggle-btn" title="Quick Suggestions" style="background: transparent; border: none; color: var(--accent); padding: 0 8px; cursor: pointer; font-size: 16px;">
+                ⚡
+            </button>
+          <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
+          <button id="chat-mic-btn" title="Speak to chat" style="background: transparent; border: none; color: var(--accent); padding: 0 12px; cursor: pointer; font-size: 16px;">
+              🎤
+          </button>
+          <button id="chat-send-btn">Send</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- AI Recruiter Matcher Modal Overlay -->
+<div id="matcherModal" class="matcher-modal-overlay chat-hidden">
+  <div class="matcher-modal-content">
+    <div class="matcher-modal-header">
+      <h3>AI Recruiter Matcher</h3>
+      <button id="closeMatcherBtn" class="matcher-close-btn">✖</button>
+    </div>
+    
+    <div class="matcher-modal-body">
+      <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px;">
+        Paste a Job Description below to see how well my skills, projects, and background align with your requirements.
+      </p>
+      
+      <div class="form-field" style="margin-bottom: 16px;">
+        <textarea id="modalJdInput" rows="5" placeholder="Paste Job Description here..." style="width: 100%; padding: 12px; border: 1px solid rgba(148, 163, 184, 0.22); border-radius: var(--radius-sm); background: rgba(13, 23, 36, 0.9); color: var(--text-primary); font-family: var(--font-body); font-size: 0.95rem; resize: vertical;"></textarea>
+      </div>
+      
+      <button id="modalAnalyzeBtn" class="btn btn-primary" style="width: 100%;">Analyze Match</button>
+      
+      <div id="modalResultArea" style="margin-top: 20px; padding: 16px; background: rgba(8, 19, 31, 0.8); border-radius: var(--radius-sm); border: 1px solid rgba(100, 255, 218, 0.2); color: var(--text-primary); font-size: 0.9rem; white-space: pre-line; max-height: 250px; overflow-y: auto; display: none;">
+        <!-- AI Response yahan aayega -->
+      </div>
+
+      <div id="modalFooterAction" style="display: none; margin-top: 16px; align-items: center; justify-content: space-between; gap: 12px; background: rgba(100, 255, 218, 0.04); border: 1px solid rgba(100, 255, 218, 0.3); padding: 12px 16px; border-radius: var(--radius-sm);">
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">
+        💡 Great fit detected for your team!
+    </p>
+    <a href="contact.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px; white-space: nowrap;">
+        ⚡ Connect with Atharva
+    </a>
+</div>
+    </div>
+  </div>
+</div>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects — Atharva Phadake</title>
+  <meta name="description" content="Projects, research, and certifications by Atharva Phadake." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+   <!-- <link rel="stylesheet" href="theme.css" /> -->
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo"><span class="bracket">&lt;</span>AP<span class="bracket">/&gt;</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">home</a>
+        <a href="about.html">about</a>
+        <a href="projects.html" class="active">projects</a>
+        <a href="contact.html" class="nav-cta">contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container page-header">
+      <span class="tag">projects <span class="confidence">03</span></span>
+      <h1>Projects &amp; Research</h1>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <span class="tag">projects</span>
+        <h2 class="section-heading">Things I've built</h2>
+
+        <div class="project-grid">
+          <article class="project-card">
+            <div class="project-top">
+              <h3>AI Meeting Assistant</h3>
+              <a href="https://github.com/phadake111/AI-Video-Assistant" class="project-git-link" target="_blank" rel="noopener noreferrer" aria-label="View source code on GitHub">
+                <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.1.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+              </a>
+              <!-- <span class="project-glyph">◎</span> -->
+            </div>
+            <p>Multi-lingual transcription and summarization for English and Hindi/Hinglish, achieving ~90% accuracy, with a RAG-based chat feature that answers queries in under 2 seconds.</p>
+            <div class="project-stats">
+              <span>~90% accuracy</span>
+              <span>&lt;2s query response</span>
+              <span>RAG chat</span>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-top">
+              <h3>Multi-Agent AI Research System</h3>
+              <a href="https://github.com/phadake111/AI-Research-assistant" class="project-git-link" target="_blank" rel="noopener noreferrer" aria-label="View source code on GitHub">
+                <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.1.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+              </a>
+              <!-- <span class="project-glyph">◎</span> -->
+            </div>
+            <p>A pipeline that collects data from 10–15 sources, ranks the top 5, and generates structured markdown reports in 3–4 minutes.</p>
+            <div class="project-stats">
+              <span>10-15 sources</span>
+              <span>top 5 ranked</span>
+              <span>3-4 min reports</span>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-top">
+              <h3>Training Unit</h3>
+              <a href="https://github.com/phadake111/Training-Unit" class="project-git-link" target="_blank" rel="noopener noreferrer" aria-label="View source code on GitHub">
+                <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.1.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+              </a>
+              <!-- <span class="project-glyph">◎</span> -->
+            </div>
+            <p>A YOLOv8 desktop app for end-to-end training, covering data collection and annotation, with an auto-apply feature for static-position datasets.</p>
+            <div class="project-stats">
+              <span>data collection</span>
+              <span>annotation</span>
+              <span>auto-apply</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <span class="tag">publication</span>
+        <h2 class="section-heading">Research</h2>
+
+        <div class="pub-card">
+          <span class="pub-venue">IEEE ICSFT 2026</span>
+          <h3>"ChatGPT in Classrooms: Tool or Threat? A Comprehensive Study of Student Perceptions"</h3>
+
+          <div class="project-stats">
+            📝
+            <span>
+                <a href="https://doi.org/10.1109/ICSFT67370.2026.11566611" target="_blank">
+                    Visit Paper
+                </a>
+            </span>
+        </div>
+        </div>
+        
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <span class="tag">certifications</span>
+        <h2 class="section-heading">Certifications</h2>
+
+        <div class="cert-grid">
+          <div class="cert-card">
+            <h4>Agentic AI Certified Foundation Assosisate</h4>
+            <p>Oracle</p>
+          </div>
+          <div class="cert-card">
+            <h4>Deep Learning</h4>
+            <p>IIT Ropar, NPTEL</p>
+          </div>
+          <div class="cert-card">
+            <h4>Data Analytics</h4>
+            <p>Deloitte</p>
+          </div>
+          <div class="cert-card">
+            <h4>AI &amp; Employability</h4>
+            <p>Magic Bus</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Designed &amp; built by Atharva Phadake — &copy; 2026</p>
+  </footer>
+
+  <a href="index.html#chat-widget-container" id="chat-redirect-tag">
+    💬 Chat with Atharva's AI
+  </a>
+  <script src="script.js"></script>
+</body>
+</html>
