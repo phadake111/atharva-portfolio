@@ -20,41 +20,54 @@ llm = ChatGroq(
     temperature=0.0  # Deterministic output ke liye 0.0
 )
 
-# Database Folder Configuration
+# Database Folder & Lazy Loading Configuration
 CHROMA_PATH = "chroma_db_store"
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-
-# Global variable to store full resume text for 100% retrieval accuracy
+_embeddings = None
 FULL_RESUME_TEXT = ""
+vectorstore = None
+retriever = None
 
-try:
-    if os.path.exists(CHROMA_PATH) and os.listdir(CHROMA_PATH):
-        vectorstore = Chroma(persist_directory=CHROMA_PATH, embedding_function=embeddings)
-        # Load all documents to extract full text
-        all_docs = vectorstore.get()
-        if all_docs and "documents" in all_docs:
-            FULL_RESUME_TEXT = "\n".join(all_docs["documents"])
-    else:
-        loader = PyPDFLoader("Atharva_Phadake_Resume.pdf") 
-        docs = loader.load()
-        
-        # Save full raw text directly
-        FULL_RESUME_TEXT = "\n".join([doc.page_content for doc in docs])
-        
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-        splits = text_splitter.split_documents(docs)
-        
-        vectorstore = Chroma.from_documents(
-            documents=splits, 
-            embedding=embeddings,
-            persist_directory=CHROMA_PATH
-        )
+def get_embeddings():
+    global _embeddings
+    if _embeddings is None:
+        _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    return _embeddings
 
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 5}) 
-    
-except Exception as e:
-    print(f"Error during Chroma setup: {e}")
-    retriever = None
+def initialize_rag():
+    """Lazy loads embeddings, PDF, and ChromaDB only when a request arrives."""
+    global FULL_RESUME_TEXT, vectorstore, retriever
+    if FULL_RESUME_TEXT:
+        return  # Already initialized
+        
+    try:
+        emb = get_embeddings()
+        if os.path.exists(CHROMA_PATH) and os.listdir(CHROMA_PATH):
+            vectorstore = Chroma(persist_directory=CHROMA_PATH, embedding_function=emb)
+            # Load all documents to extract full text
+            all_docs = vectorstore.get()
+            if all_docs and "documents" in all_docs:
+                FULL_RESUME_TEXT = "\n".join(all_docs["documents"])
+        else:
+            loader = PyPDFLoader("Atharva_Phadake_Resume.pdf") 
+            docs = loader.load()
+            
+            # Save full raw text directly
+            FULL_RESUME_TEXT = "\n".join([doc.page_content for doc in docs])
+            
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+            splits = text_splitter.split_documents(docs)
+            
+            vectorstore = Chroma.from_documents(
+                documents=splits, 
+                embedding=emb,
+                persist_directory=CHROMA_PATH
+            )
+
+        retriever = vectorstore.as_retriever(search_kwargs={"k": 5}) 
+        
+    except Exception as e:
+        print(f"Error during Chroma setup: {e}")
+        retriever = None
 
 class GraphState(TypedDict):
     question: str
@@ -115,7 +128,8 @@ def resume_chat_node(state: GraphState) -> GraphState:
     """Answers factual questions about Atharva's credentials using the FULL resume context to prevent missing projects."""
     question = state["question"]
     
-    # FIX: Using FULL_RESUME_TEXT instead of partial retrieval so no project or education detail is ever missed
+    # Ensure RAG is initialized on first use
+    initialize_rag()
     context = FULL_RESUME_TEXT
     
     system_prompt = """You are a professional assistant answering questions about Atharva Phadake.
@@ -146,7 +160,8 @@ def analyze_job_match(job_description: str) -> str:
     Matches a given job description against Atharva's complete resume context for 100% accuracy.
     """
     try:
-        # FIX: Using FULL_RESUME_TEXT for job matching to ensure all credentials and education details are evaluated correctly
+        # Ensure RAG is initialized on first use
+        initialize_rag()
         context = FULL_RESUME_TEXT
         
         system_prompt = """You are an expert HR Technical Recruiter and Career Matcher specializing in applicant tracking systems (ATS) and talent acquisition analytics. Your task is to analyze a candidate's complete resume context against a provided Job Description (JD) and deliver a highly accurate, objective match assessment.
