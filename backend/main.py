@@ -6,8 +6,9 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import time
+import uvicorn
 
-from .rag_engine import get_ai_response, analyze_job_match
+from rag_engine import get_ai_response, analyze_job_match
 
 app = FastAPI(title="Atharva's Portfolio API")
 
@@ -122,3 +123,4 @@ async def match_job_description(request: JobMatchRequest):
     except Exception as e:
         print(f"Match API Error: {e}")
         return {"status": "error", "match_analysis": "Could not analyze the job description at the moment."}
+    
