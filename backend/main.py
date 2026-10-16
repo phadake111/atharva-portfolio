@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import time
 
-from rag_engine import get_ai_response,analyze_job_match
+from .rag_engine import get_ai_response, analyze_job_match
 
 app = FastAPI(title="Atharva's Portfolio API")
 
