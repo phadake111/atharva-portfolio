@@ -5,7 +5,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   initMobileNav();
-//   initContactForm();
+  initContactForm();
 });
 
 /**
@@ -75,6 +75,68 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // CONTACT FORM API INTEGRATION
 // ==========================================
+function initContactForm() {
+    const contactForm = document.getElementById("contactForm");
+    const formStatus = document.getElementById("formStatus");
+    const submitBtn = document.getElementById("submitBtn");
+
+    if (!contactForm) return;
+
+    contactForm.addEventListener("submit", async (e) => {
+        e.preventDefault(); // Default form submit aur URL query appending ko rokne ke liye
+
+        const name = document.getElementById("nameInput").value.trim();
+        const email = document.getElementById("emailInput").value.trim();
+        const message = document.getElementById("messageInput").value.trim();
+
+        if (!name || !email || !message) {
+            if (formStatus) {
+                formStatus.style.color = "#ff6b6b";
+                formStatus.innerText = "Please fill in all fields.";
+            }
+            return;
+        }
+
+        const originalBtnText = submitBtn.innerText;
+        submitBtn.innerText = "Sending...";
+        submitBtn.disabled = true;
+        if (formStatus) formStatus.innerText = "";
+
+        try {
+            // Live Render backend URL par POST request bhej rahe hain
+            const response = await fetch("https://atharva-portfolio-backend.onrender.com/api/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, message })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.status === "success") {
+                if (formStatus) {
+                    formStatus.style.color = "#4cd137";
+                    formStatus.innerText = data.message || "Message sent successfully!";
+                }
+                contactForm.reset(); // Form fields ko clean kar dega
+            } else {
+                if (formStatus) {
+                    formStatus.style.color = "#ff6b6b";
+                    formStatus.innerText = data.detail || "Failed to send message. Please try again.";
+                }
+            }
+        } catch (error) {
+            console.error("Contact API Error:", error);
+            if (formStatus) {
+                formStatus.style.color = "#ff6b6b";
+                formStatus.innerText = "Network error. Please check your connection.";
+            }
+        } finally {
+            submitBtn.innerText = originalBtnText;
+            submitBtn.disabled = false;
+        }
+    });
+}
+
 // =========================================================
 // AI CHATBOT API INTEGRATION (FastAPI)
 // =========================================================
