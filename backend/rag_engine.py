@@ -5,9 +5,6 @@ from typing import TypedDict, Literal
 # LangChain & LangGraph Imports
 from langchain_groq import ChatGroq
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.graph import StateGraph, END
 
@@ -17,57 +14,26 @@ load_dotenv()
 llm = ChatGroq(
     api_key=os.environ.get("GROQ_API_KEY"),
     model_name="openai/gpt-oss-20b", 
-    temperature=0.0  # Deterministic output ke liye 0.0
+    temperature=0.0
 )
 
-# Database Folder & Lazy Loading Configuration
-CHROMA_PATH = "chroma_db_store"
-_embeddings = None
+# Load Full Resume Text directly without heavy embeddings/Chroma
 FULL_RESUME_TEXT = ""
-vectorstore = None
-retriever = None
 
-def get_embeddings():
-    global _embeddings
-    if _embeddings is None:
-        _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-    return _embeddings
-
-def initialize_rag():
-    """Lazy loads embeddings, PDF, and ChromaDB only when a request arrives."""
-    global FULL_RESUME_TEXT, vectorstore, retriever
+def initialize_resume():
+    global FULL_RESUME_TEXT
     if FULL_RESUME_TEXT:
-        return  # Already initialized
-        
+        return
     try:
-        emb = get_embeddings()
-        if os.path.exists(CHROMA_PATH) and os.listdir(CHROMA_PATH):
-            vectorstore = Chroma(persist_directory=CHROMA_PATH, embedding_function=emb)
-            # Load all documents to extract full text
-            all_docs = vectorstore.get()
-            if all_docs and "documents" in all_docs:
-                FULL_RESUME_TEXT = "\n".join(all_docs["documents"])
-        else:
-            loader = PyPDFLoader("Atharva_Phadake_Resume.pdf") 
-            docs = loader.load()
-            
-            # Save full raw text directly
-            FULL_RESUME_TEXT = "\n".join([doc.page_content for doc in docs])
-            
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-            splits = text_splitter.split_documents(docs)
-            
-            vectorstore = Chroma.from_documents(
-                documents=splits, 
-                embedding=emb,
-                persist_directory=CHROMA_PATH
-            )
-
-        retriever = vectorstore.as_retriever(search_kwargs={"k": 5}) 
-        
+        loader = PyPDFLoader("Atharva_Phadake_Resume.pdf") 
+        docs = loader.load()
+        FULL_RESUME_TEXT = "\n".join([doc.page_content for doc in docs])
     except Exception as e:
-        print(f"Error during Chroma setup: {e}")
-        retriever = None
+        print(f"Error loading resume PDF: {e}")
+        FULL_RESUME_TEXT = "Atharva Phadake - Computer Science Graduate & AI/ML Developer."
+
+# Initialize on startup
+initialize_resume()
 
 class GraphState(TypedDict):
     question: str
@@ -103,17 +69,13 @@ STRICT INSTRUCTIONS:
     decision = result.content.strip().lower()
     
     if "resume" in decision:
-        print("-> Routing to RESUME Node")
         return "resume_node"
     elif "general" in decision:
-        print("-> Routing to GENERAL Node")
         return "general_node"
     else:
-        print("-> Routing to SORRY Node")
         return "sorry_node"
 
 def general_chat_node(state: GraphState) -> GraphState:
-    """Handles brief greetings and pleasantries."""
     question = state["question"]
     system_prompt = """You are the general greeting handler for Atharva's Portfolio Assistant.
 Respond to greetings and polite casual conversation warmly, professionally, and briefly (1 sentence maximum). 
@@ -125,11 +87,8 @@ Do not answer resume questions here."""
     return {"question": question, "answer": response.content}
 
 def resume_chat_node(state: GraphState) -> GraphState:
-    """Answers factual questions about Atharva's credentials using the FULL resume context to prevent missing projects."""
     question = state["question"]
-    
-    # Ensure RAG is initialized on first use
-    initialize_rag()
+    initialize_resume()
     context = FULL_RESUME_TEXT
     
     system_prompt = """You are a professional assistant answering questions about Atharva Phadake.
@@ -144,10 +103,9 @@ Context:
     return {"question": question, "answer": response.content}
 
 def sorry_chat_node(state: GraphState) -> GraphState:
-    """Handles out-of-context requests."""
     question = state["question"]
     system_prompt = """You are the fallback assistant for Atharva's Portfolio Bot.
-Politely inform the user that this specific request (like live updates or off-topic questions) falls outside the scope of this professional assistant. 
+Politely inform the user that this specific request falls outside the scope of this professional assistant. 
 Invite them to ask questions regarding Atharva's resume, technical skills, or engineering projects."""
     
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt), ("human", "{question}")])
@@ -156,12 +114,8 @@ Invite them to ask questions regarding Atharva's resume, technical skills, or en
     return {"question": question, "answer": response.content}
 
 def analyze_job_match(job_description: str) -> str:
-    """
-    Matches a given job description against Atharva's complete resume context for 100% accuracy.
-    """
     try:
-        # Ensure RAG is initialized on first use
-        initialize_rag()
+        initialize_resume()
         context = FULL_RESUME_TEXT
         
         system_prompt = """You are an expert HR Technical Recruiter and Career Matcher specializing in applicant tracking systems (ATS) and talent acquisition analytics. Your task is to analyze a candidate's complete resume context against a provided Job Description (JD) and deliver a highly accurate, objective match assessment.
@@ -179,8 +133,8 @@ def analyze_job_match(job_description: str) -> str:
 
             ### Strict Evaluation Criteria
             1. **Match Percentage Logic:** Calculate this based on core technical skills (40%), years of relevant experience (30%), domain/industry alignment (20%), and soft skills/education (10%). Be realistic and objective—do not give 100% unless it is an exact, flawless match.
-            2. **Bullet Points:** Provide exactly 3 to 4 bullet points. They must be short, punchy, and highly specific. Avoid generic phrases like "Good communication skills" or "Strong candidate." Instead, use concrete terms (e.g., "Matches the 3+ years of React and TypeScript requirement perfectly").
-            3. **Factual Grounding:** Rely strictly on the provided resume context. Do not assume, hallucinate, or extrapolate skills or experiences that are not explicitly stated in the context. Ensure education history (such as degrees and institutions) is quoted precisely without mixing up details.
+            2. **Bullet Points:** Provide exactly 3 to 4 bullet points. They must be short, punchy, and highly specific. Avoid generic phrases like "Good communication skills" or "Strong candidate." Instead, use concrete terms.
+            3. **Factual Grounding:** Rely strictly on the provided resume context. Ensure history is quoted precisely.
             4. **Tone:** Maintain a professional, objective, and analytical recruiter tone.
 
         Context:
@@ -192,12 +146,7 @@ def analyze_job_match(job_description: str) -> str:
         ])
         
         chain = prompt | llm
-        
-        response = chain.invoke({
-            "context": context, 
-            "job_description": job_description
-        })
-        
+        response = chain.invoke({"context": context, "job_description": job_description})
         return response.content
 
     except Exception as e:
