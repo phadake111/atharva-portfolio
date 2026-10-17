@@ -31,7 +31,7 @@ class ChatRequest(BaseModel):
 class JobMatchRequest(BaseModel):
     job_description: str
 
-def send_thank_you_email(receiver_email: str, receiver_name: str):
+def send_contact_emails(receiver_email: str, receiver_name: str, user_message: str):
     sender_email = os.getenv("EMAIL_SENDER")
     sender_password = os.getenv("EMAIL_PASSWORD")
     
@@ -39,69 +39,61 @@ def send_thank_you_email(receiver_email: str, receiver_name: str):
         print("Skipping email: Setup missing in .env file.")
         return False
 
-    msg = MIMEMultipart('alternative') # Changed from blank to 'alternative' to look natural to spam filters
-    msg['From'] = f"Atharva Phadake Portfolio <{sender_email}>" # Clean Sender Name format
-    msg['To'] = receiver_email
-    msg['Subject'] = f"Received your message, {receiver_name}!"
-    
-    # Anti-Spam Headers: Makes the email look authentic
-    msg['Message-ID'] = f"<{time.time()}@{sender_email.split('@')[1]}>"
-    msg['X-Mailer'] = "Python-smtplib"
-
-    # Professional email layout content block
-    body = f"""Hello {receiver_name},
-
-Thank you for visiting my portfolio platform and reaching out.
-
-This is a quick confirmation to let you know that I have safely received your contact submission. I am looking forward to reviewing your message and connecting with you shortly.
-
-If you want to review more of my engineering projects or technical skills in the meantime, feel free to chat with my interactive portfolio AI assistant on the website!
-
-Best regards,
-Atharva Phadake
-"""
-    msg.attach(MIMEText(body, 'plain'))
-
     try:
         server = smtplib.SMTP('smtp.gmail.com', 587, timeout=10) 
         server.starttls()  
         server.login(sender_email, sender_password)
-        server.sendmail(sender_email, receiver_email, msg.as_string())
+
+        # 1. Admin Notification Email (Aapke liye alert)
+        admin_msg = MIMEMultipart('alternative')
+        admin_msg['From'] = f"Portfolio Contact <{sender_email}>"
+        admin_msg['To'] = sender_email
+        admin_msg['Subject'] = f"New Portfolio Message from {receiver_name}!"
+        
+        admin_body = f"""Hello Atharva,
+
+You have received a new message through your portfolio contact form:
+
+Name: {receiver_name}
+Email: {receiver_email}
+Message: 
+{user_message}
+
+Best regards,
+Portfolio System
+"""
+        admin_msg.attach(MIMEText(admin_body, 'plain'))
+        server.sendmail(sender_email, sender_email, admin_msg.as_string())
+
+        # 2. Thank You Email (User ke liye confirmation)
+        user_msg = MIMEMultipart('alternative')
+        user_msg['From'] = f"Atharva Phadake <{sender_email}>"
+        user_msg['To'] = receiver_email
+        user_msg['Subject'] = f"Received your message, {receiver_name}!"
+        
+        user_body = f"""Hello {receiver_name},
+
+Thank you for visiting my portfolio platform and reaching out.
+
+This is a quick confirmation to let you know that I have safely received your message. I am looking forward to reviewing it and connecting with you shortly.
+
+Best regards,
+Atharva Phadake
+"""
+        user_msg.attach(MIMEText(user_body, 'plain'))
+        server.sendmail(sender_email, receiver_email, user_msg.as_string())
+
         server.quit()
-        print(f"-> Confirmation email successfully sent to {receiver_email}")
+        print(f"-> Notifications and confirmation emails successfully sent!")
         return True
     except Exception as e:
         print(f"Email failure log: {e}")
         return False
 
-
 # --- UPDATED CONTACT ENDPOINT WITH BACKGROUND TASKS ---
 @app.post("/api/contact")
 async def contact_form(contact: ContactMessage, background_tasks: BackgroundTasks):
-    # 1. Format text file entry
-    log_entry = (
-        f"========================================\n"
-        f"Name: {contact.name}\n"
-        f"Email: {contact.email}\n"
-        f"Message: {contact.message}\n"
-        f"Timestamp: {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
-        f"========================================\n\n"
-    )
-    
-    try:
-        # 2. Write to text file instantly
-        with open("contacts_log.txt", "a", encoding="utf-8") as file:
-            file.write(log_entry)
-        print(f"-> Successfully saved message entry for {contact.name}")
-    except Exception as e:
-        print(f"Local file system error: {e}")
-        raise HTTPException(status_code=500, detail="Could not save message details locally.")
-
-    # 3. Queue the email to process quietly in the background
-    # This prevents the network error from blocking your web page or crashing the endpoint response!
-    background_tasks.add_task(send_thank_you_email, contact.email, contact.name)
-    
-    # 4. Return success immediately to the frontend user interface
+    background_tasks.add_task(send_contact_emails, contact.email, contact.name,contact.message)
     return {"status": "success", "message": "Thanks! Your message has been received."}
 
 
