@@ -90,6 +90,18 @@ Atharva Phadake
         print(f"Email failure log: {e}")
         return False
 
+@app.post("/api/contact")
+async def contact_form(contact: ContactMessage):
+    # Direct function call karke check kar rahe hain ki kya error aa raha hai
+    try:
+        success = send_contact_emails(contact.email, contact.name, contact.message)
+        if success:
+            return {"status": "success", "message": "Email sent successfully!"}
+        else:
+            return {"status": "error", "message": "Function returned False. Check credentials."}
+    except Exception as e:
+        # Exact error ko seedha frontend par dikha denge!
+        return {"status": "error", "message": f"SMTP Error: {str(e)}"}
 
 @app.post("/api/chat")
 async def chat_with_resume(request: ChatRequest):
