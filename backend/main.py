@@ -40,15 +40,15 @@ def send_contact_emails(receiver_email: str, receiver_name: str, user_message: s
         return False
 
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=10) 
-        server.starttls()  
+        # Port 465 use kar rahe hain SMTP_SSL ke sath (No starttls needed here)
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=10) 
         server.login(sender_email, sender_password)
 
-        # 1. Admin Notification Email (Aapke liye alert)
+        # 1. Admin Notification Email
         admin_msg = MIMEMultipart('alternative')
-        admin_msg['From'] = f"Portfolio Contact <{sender_email}>"
+        admin_msg['From'] = f"Portfolio Contact Bot <{sender_email}>"
         admin_msg['To'] = sender_email
-        admin_msg['Subject'] = f"New Portfolio Message from {receiver_name}!"
+        admin_msg['Subject'] = f"🚀 New Portfolio Message from {receiver_name}!"
         
         admin_body = f"""Hello Atharva,
 
@@ -65,7 +65,7 @@ Portfolio System
         admin_msg.attach(MIMEText(admin_body, 'plain'))
         server.sendmail(sender_email, sender_email, admin_msg.as_string())
 
-        # 2. Thank You Email (User ke liye confirmation)
+        # 2. Thank You Email to User
         user_msg = MIMEMultipart('alternative')
         user_msg['From'] = f"Atharva Phadake <{sender_email}>"
         user_msg['To'] = receiver_email
@@ -84,25 +84,11 @@ Atharva Phadake
         server.sendmail(sender_email, receiver_email, user_msg.as_string())
 
         server.quit()
-        print(f"-> Notifications and confirmation emails successfully sent!")
+        print(f"-> Notifications and confirmation emails successfully sent via Port 465!")
         return True
     except Exception as e:
         print(f"Email failure log: {e}")
         return False
-
-# --- UPDATED CONTACT ENDPOINT WITH BACKGROUND TASKS ---
-@app.post("/api/contact")
-async def contact_form(contact: ContactMessage):
-    # Direct function call karke check kar rahe hain ki kya error aa raha hai
-    try:
-        success = send_contact_emails(contact.email, contact.name, contact.message)
-        if success:
-            return {"status": "success", "message": "Email sent successfully!"}
-        else:
-            return {"status": "error", "message": "Function returned False. Check credentials."}
-    except Exception as e:
-        # Exact error ko seedha frontend par dikha denge!
-        return {"status": "error", "message": f"SMTP Error: {str(e)}"}
 
 
 @app.post("/api/chat")
